@@ -42,50 +42,61 @@ function page() {
 
     const insertRowData = async (contents: BoardContent[]) => {
         // Supabase 데이터베이스에 연동
-        if (boards?.contents) {
-            const { data, error, status } = await supabase.from("todos").update({ contents: contents }).eq("id", pathname.split("/")[2]).select();
+        const { data, error, status } = await supabase.from("todos").update({ contents: contents }).eq("id", pathname.split("/")[2]);
 
-            console.log(status);
-            if (error) {
-                console.log(error);
-                toast({
-                    title: "에러가 발생했습니다.",
-                    description: "콘솔 창에 출력된 에러를 확인하세요.",
-                });
-            }
-            if (status === 200) {
-                toast({
-                    title: "추가 완료!",
-                    description: "새로운 TO DO BOARD가 추가 되었습니다.",
-                });
-
-                getData();
-            }
-        } else {
-            const { data, error, status } = await supabase.from("todos").insert({ contents: contents }).eq("id", pathname.split("/")[2]).select();
-
-            console.log(status);
-
-            if (error) {
-                console.log(error);
-                toast({
-                    title: "에러가 발생했습니다.",
-                    description: "콘솔 창에 출력된 에러를 확인하세요.",
-                });
-            }
-            if (status === 201) {
-                toast({
-                    title: "생성 완료!",
-                    description: "새로운 TO DO BOARD가 생성 되었습니다.",
-                });
-
-                getData();
-            }
+        console.log(status);
+        if (error) {
+            console.log(error);
+            toast({
+                title: "에러가 발생했습니다.",
+                description: "콘솔 창에 출력된 에러를 확인하세요.",
+            });
         }
+        if (status === 204) {
+            toast({
+                title: "추가 완료!",
+                description: "새로운 TO DO BOARD가 추가 되었습니다.",
+            });
+
+            getData();
+        }
+        // if (boards?.contents) {
+        //     const { data, error, status } = await supabase.from("todos").update({ contents: contents }).eq("id", pathname.split("/")[2]).select();
+        //     console.log(status);
+        //     if (error) {
+        //         console.log(error);
+        //         toast({
+        //             title: "에러가 발생했습니다.",
+        //             description: "콘솔 창에 출력된 에러를 확인하세요.",
+        //         });
+        //     }
+        //     if (status === 200) {
+        //         toast({
+        //             title: "추가 완료!",
+        //             description: "새로운 TO DO BOARD가 추가 되었습니다.",
+        //         });
+        //         getData();
+        //     }
+        // } else {
+        //     const { data, error, status } = await supabase.from("todos").insert({ contents: contents }).eq("id", pathname.split("/")[2]).select();
+        //     console.log(status);
+        //     if (error) {
+        //         console.log(error);
+        //         toast({
+        //             title: "에러가 발생했습니다.",
+        //             description: "콘솔 창에 출력된 에러를 확인하세요.",
+        //         });
+        //     }
+        //     if (status === 201) {
+        //         toast({
+        //             title: "생성 완료!",
+        //             description: "새로운 TO DO BOARD가 생성 되었습니다.",
+        //         });
+        //         getData();
+        //     }
+        // }
     };
     const createBoard = () => {
-        console.log(boards);
-
         let newContents: BoardContent[] = [];
         const boardContent = {
             boardId: nanoid(),
@@ -111,7 +122,6 @@ function page() {
     // Supabase에 기존에 생성된 페이지가 있는지 없는지 확인
     const getData = async () => {
         let { data: todos, error } = await supabase.from("todos").select("*");
-        console.log(todos);
 
         if (todos !== null) {
             todos.forEach((item: Todo) => {
@@ -149,11 +159,7 @@ function page() {
                             <LabelCalendar label="From" handleDate={setStartDate} />
                             <LabelCalendar label="To" handleDate={setEndDate} />
                         </div>
-                        <Button
-                            variant={"outline"}
-                            className="w-[15%] border-orange-500 bg-orange-400 text-white hover:bg-orange-400 hover:text-white"
-                            onClick={createBoard}
-                        >
+                        <Button variant={"outline"} className="w-[15%] border-orange-500 bg-orange-400 text-white hover:bg-orange-400 hover:text-white" onClick={createBoard}>
                             Add New Board
                         </Button>
                     </div>

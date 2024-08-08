@@ -1,3 +1,4 @@
 -   Next.js Markdown Editor 설치: `npm i @uiw/react-md-editor`
 -   서버리스 데이터베이스 Supabase 설치: `npm i @supabase/supabase-js`
 -   고유한 키 값을 생성하기 위한 라이브러리: `npm i nanoid`
+-   Supabase Database Access Password: `7UTRlZn372YkKfDK`
