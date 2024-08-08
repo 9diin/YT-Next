@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { supabase } from "@/utils/supabase";
 // Components
 import LabelCalendar from "../calendar/LabelCalendar";
@@ -11,11 +12,27 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
-
 // CSS
 import styles from "./MarkdownDialog.module.scss";
 
+interface Todo {
+    id: number;
+    title: string;
+    start_date: string;
+    end_date: string;
+    contents: BoardContent[];
+}
+interface BoardContent {
+    boardId: string | number;
+    isCompleted: boolean;
+    title: string;
+    stateDate: Date;
+    endDate: Date;
+    content: string;
+}
 function MarkdownDialog() {
+    const pathname = usePathname();
+
     const [open, setOpen] = useState<boolean>(false);
     const [title, setTitle] = useState<string>("");
     const [startDate, setStartDate] = useState<Date | undefined>(new Date());
@@ -36,38 +53,56 @@ function MarkdownDialog() {
             });
             return;
         } else {
-            // Supabase 데이터베이스에 연동
-            const { data, error, status } = await supabase
-                .from("todos")
-                .insert([
-                    {
-                        contents: [
-                            {
-                                title: title,
-                                start_date: startDate,
-                                end_date: endDate,
-                                content: content,
-                            },
-                        ],
-                    },
-                ])
-                .select();
+            // 해당 Board에 대한 데이터만 수정
+            let { data: todos } = await supabase.from("todos").select("*");
 
-            if (error) {
-                console.log(error);
-                toast({
-                    title: "에러가 발생했습니다.",
-                    description: "콘솔 창에 출력된 에러를 확인하세요.",
-                });
-            }
-            if (status === 201) {
-                toast({
-                    title: "생성 완료!",
-                    description: "작성한 글이 Supabase에 올바르게 저장되었습니다.",
-                });
+            if (todos !== null) {
+                todos.forEach(async (item: Todo) => {
+                    if (item.id === Number(pathname.split("/")[2])) {
+                        console.log(item);
 
-                // 등록 후 조건 초기화
-                setOpen(false);
+                        item.contents.forEach((element: BoardContent) => {
+                            if (element.boardId === "Y1nYHZb4xs_wlTN9luGmK") {
+                                element.content = content;
+                                element.title = title;
+                                element.stateDate = startDate;
+                                element.endDate = endDate;
+                            } else {
+                                element.content = element.content;
+                                element.title = element.title;
+                                element.stateDate = element.stateDate;
+                                element.endDate = element.endDate;
+                            }
+                        });
+
+                        // Supabase 데이터베이스에 연동
+                        const { data, error, status } = await supabase
+                            .from("todos")
+                            .update({
+                                contents: item.contents,
+                            })
+                            .eq("id", pathname.split("/")[2]);
+
+                        if (error) {
+                            console.log(error);
+                            toast({
+                                title: "에러가 발생했습니다.",
+                                description: "콘솔 창에 출력된 에러를 확인하세요.",
+                            });
+                        }
+                        if (status === 204) {
+                            toast({
+                                title: "수정 완료!",
+                                description: "작성한 글이 Supabase에 올바르게 저장되었습니다.",
+                            });
+
+                            // 등록 후 조건 초기화
+                            setOpen(false);
+                        }
+                    } else {
+                        return;
+                    }
+                });
             }
         }
     };
@@ -85,12 +120,7 @@ function MarkdownDialog() {
                     <DialogTitle>
                         <div className={styles.dialog__titleBox}>
                             <Checkbox className="w-5 h-5" />
-                            <input
-                                type="text"
-                                placeholder="Write a title for your board."
-                                className={styles.dialog__titleBox__title}
-                                onChange={(event) => setTitle(event.target.value)}
-                            />
+                            <input type="text" placeholder="Write a title for your board." className={styles.dialog__titleBox__title} onChange={(event) => setTitle(event.target.value)} />
                         </div>
                     </DialogTitle>
                     <div className={styles.dialog__calendarBox}>
@@ -109,11 +139,7 @@ function MarkdownDialog() {
                                 Cancel
                             </Button>
                         </DialogClose>
-                        <Button
-                            type={"submit"}
-                            className="font-normal border-orange-500 bg-orange-400 text-white hover:bg-orange-400 hover:text-white"
-                            onClick={onSubmit}
-                        >
+                        <Button type={"submit"} className="font-normal border-orange-500 bg-orange-400 text-white hover:bg-orange-400 hover:text-white" onClick={onSubmit}>
                             Done
                         </Button>
                     </div>
