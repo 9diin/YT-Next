@@ -27,7 +27,7 @@ interface BoardContent {
     boardId: string | number;
     isCompleted: boolean;
     title: string;
-    stateDate: string;
+    startDate: string;
     endDate: string;
     content: string;
 }
@@ -44,7 +44,6 @@ function page() {
         // Supabase 데이터베이스에 연동
         const { data, error, status } = await supabase.from("todos").update({ contents: contents }).eq("id", pathname.split("/")[2]);
 
-        console.log(status);
         if (error) {
             console.log(error);
             toast({
@@ -102,7 +101,7 @@ function page() {
             boardId: nanoid(),
             isCompleted: false,
             title: "",
-            stateDate: "",
+            startDate: "",
             endDate: "",
             content: "",
         };
@@ -179,7 +178,7 @@ function page() {
                 ) : (
                     <div className="flex flex-col items-center justify-start w-full h-full gap-4">
                         {boards?.contents.map((board: BoardContent) => {
-                            return <BasicBoard key={board.boardId} />;
+                            return <BasicBoard key={board.boardId} data={board} />;
                         })}
                     </div>
                 )}

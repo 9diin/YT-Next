@@ -26,11 +26,15 @@ interface BoardContent {
     boardId: string | number;
     isCompleted: boolean;
     title: string;
-    stateDate: Date;
-    endDate: Date;
+    startDate: string | Date;
+    endDate: string | Date;
     content: string;
 }
-function MarkdownDialog() {
+interface Props {
+    data: BoardContent;
+}
+
+function MarkdownDialog({ data }: Props) {
     const pathname = usePathname();
 
     const [open, setOpen] = useState<boolean>(false);
@@ -62,15 +66,15 @@ function MarkdownDialog() {
                         console.log(item);
 
                         item.contents.forEach((element: BoardContent) => {
-                            if (element.boardId === "Y1nYHZb4xs_wlTN9luGmK") {
+                            if (element.boardId === "FQC-euF6jHGbTwJ4KPKjG") {
                                 element.content = content;
                                 element.title = title;
-                                element.stateDate = startDate;
+                                element.startDate = startDate;
                                 element.endDate = endDate;
                             } else {
                                 element.content = element.content;
                                 element.title = element.title;
-                                element.stateDate = element.stateDate;
+                                element.startDate = element.startDate;
                                 element.endDate = element.endDate;
                             }
                         });
@@ -90,6 +94,7 @@ function MarkdownDialog() {
                                 description: "콘솔 창에 출력된 에러를 확인하세요.",
                             });
                         }
+                        console.log(status);
                         if (status === 204) {
                             toast({
                                 title: "수정 완료!",
@@ -109,12 +114,16 @@ function MarkdownDialog() {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                {/* <Button variant={"ghost"} className="font-normal text-gray-400 hover:text-gray-500 cursor-pointer">
-                    Add Contents
-                </Button> */}
-                <span className="font-normal text-gray-400 hover:text-gray-500 cursor-pointer">Add Contents</span>
-            </DialogTrigger>
+            {data.title ? (
+                <DialogTrigger asChild>
+                    <span className="font-normal text-gray-400 hover:text-gray-500 cursor-pointer">Update Contents</span>
+                </DialogTrigger>
+            ) : (
+                <DialogTrigger asChild>
+                    <span className="font-normal text-gray-400 hover:text-gray-500 cursor-pointer">Add Contents</span>
+                </DialogTrigger>
+            )}
+
             <DialogContent className="max-w-fit">
                 <DialogHeader>
                     <DialogTitle>

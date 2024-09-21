@@ -1,26 +1,86 @@
 "use client";
 
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { supabase } from "@/utils/supabase";
+import MarkdownDialog from "../dialog/MarkdownDialog";
 // Shadcn UI
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import { ChevronUp } from "lucide-react";
 // CSS
 import styles from "./BasicBoard.module.scss";
-import LabelCalendar from "../calendar/LabelCalendar";
-import MarkdownDialog from "../dialog/MarkdownDialog";
 
-function BasicBoard() {
-    const [startDate, setStartDate] = useState<Date>();
-    const [endDate, setEndDate] = useState<Date>();
+interface Todo {
+    id: number;
+    title: string;
+    start_date: string;
+    end_date: string;
+    contents: BoardContent[];
+}
+interface BoardContent {
+    boardId: string | number;
+    isCompleted: boolean;
+    title: string;
+    startDate: string;
+    endDate: string;
+    content: string;
+}
+
+interface Props {
+    data: BoardContent;
+}
+
+function BasicBoard({ data }: Props) {
+    const pathname = usePathname();
+    const { toast } = useToast();
+
+    const handleDelete = async (id: string | number) => {
+        // 해당 Board에 대한 데이터만 수정
+        let { data: todos } = await supabase.from("todos").select("*");
+
+        if (todos !== null) {
+            todos.forEach(async (item: Todo) => {
+                if (item.id === Number(pathname.split("/")[2])) {
+                    console.log(item);
+
+                    let newContents = item.contents.filter((element: BoardContent) => element.boardId !== id);
+
+                    // Supabase 데이터베이스에 연동
+                    const { data, error, status } = await supabase
+                        .from("todos")
+                        .update({
+                            contents: newContents,
+                        })
+                        .eq("id", pathname.split("/")[2]);
+
+                    if (error) {
+                        console.log(error);
+                        toast({
+                            title: "에러가 발생했습니다.",
+                            description: "콘솔 창에 출력된 에러를 확인하세요.",
+                        });
+                    }
+                    if (status === 204) {
+                        toast({
+                            title: "삭제 완료!",
+                            description: "작성한 글이 Supabase에 올바르게 저장되었습니다.",
+                        });
+                    }
+                } else {
+                    return;
+                }
+            });
+        }
+    };
 
     return (
         <div className={styles.container}>
             <div className={styles.container__header}>
                 <div className={styles.container__header__titleBox}>
                     <Checkbox className="w-5 h-5" />
-                    {/* <span className={styles.title}>Please enter a title for the board.</span> */}
-                    <span className={styles.title}>It is filled in after the post is created.</span>
+                    {data.title !== "" ? <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">{data.title}</h3> : <span className={styles.title}>It is filled in after the post is created.</span>}
                 </div>
                 <Button variant={"ghost"}>
                     <ChevronUp className="w-5 h-5 text-gray-400" />
@@ -28,20 +88,26 @@ function BasicBoard() {
             </div>
             <div className={styles.container__body}>
                 <div className={styles.container__body__calendarBox}>
-                    <LabelCalendar label="From" handleDate={setStartDate} />
-                    <LabelCalendar label="To" handleDate={setEndDate} />
+                    <div className="flex items-center gap-3">
+                        <span className="text-[#6d6d6d]">From</span>
+                        <Input value={data.startDate.split("T")[0]} disabled />
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <span className="text-[#6d6d6d]">From</span>
+                        <Input value={data.endDate.split("T")[0]} disabled />
+                    </div>
                 </div>
                 <div className={styles.container__body__buttonBox}>
                     <Button variant={"ghost"} className="font-normal text-gray-400 hover:bg-green-50 hover:text-green-500">
                         Duplicate
                     </Button>
-                    <Button variant={"ghost"} className="font-normal text-gray-400 hover:bg-red-50 hover:text-red-500">
+                    <Button variant={"ghost"} className="font-normal text-gray-400 hover:bg-red-50 hover:text-red-500" onClick={() => handleDelete(data.boardId)}>
                         Delete
                     </Button>
                 </div>
             </div>
             <div className={styles.container__footer}>
-                <MarkdownDialog />
+                <MarkdownDialog data={data} />
             </div>
         </div>
     );
