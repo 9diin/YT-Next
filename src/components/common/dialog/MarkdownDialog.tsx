@@ -26,8 +26,8 @@ interface BoardContent {
     boardId: string | number;
     isCompleted: boolean;
     title: string;
-    startDate: string | Date;
-    endDate: string | Date;
+    startDate: String | Date;
+    endDate: String | Date;
     content: string;
 }
 interface Props {
@@ -66,7 +66,7 @@ function MarkdownDialog({ data }: Props) {
                         console.log(item);
 
                         item.contents.forEach((element: BoardContent) => {
-                            if (element.boardId === "FQC-euF6jHGbTwJ4KPKjG") {
+                            if (element.boardId === "-0XSbCBnPV8VK6p0HKnV3") {
                                 element.content = content;
                                 element.title = title;
                                 element.startDate = startDate;
@@ -94,7 +94,6 @@ function MarkdownDialog({ data }: Props) {
                                 description: "콘솔 창에 출력된 에러를 확인하세요.",
                             });
                         }
-                        console.log(status);
                         if (status === 204) {
                             toast({
                                 title: "수정 완료!",
@@ -123,7 +122,6 @@ function MarkdownDialog({ data }: Props) {
                     <span className="font-normal text-gray-400 hover:text-gray-500 cursor-pointer">Add Contents</span>
                 </DialogTrigger>
             )}
-
             <DialogContent className="max-w-fit">
                 <DialogHeader>
                     <DialogTitle>

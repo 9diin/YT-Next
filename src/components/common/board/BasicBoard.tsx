@@ -1,16 +1,16 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { supabase } from "@/utils/supabase";
+import { usePathname } from "next/navigation";
 import MarkdownDialog from "../dialog/MarkdownDialog";
 // Shadcn UI
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
 import { ChevronUp } from "lucide-react";
+import { Input } from "@/components/ui/input";
 // CSS
 import styles from "./BasicBoard.module.scss";
+import { toast } from "@/components/ui/use-toast";
 
 interface Todo {
     id: number;
@@ -27,17 +27,14 @@ interface BoardContent {
     endDate: string;
     content: string;
 }
-
 interface Props {
     data: BoardContent;
 }
 
 function BasicBoard({ data }: Props) {
     const pathname = usePathname();
-    const { toast } = useToast();
-
     const handleDelete = async (id: string | number) => {
-        // 해당 Board에 대한 데이터만 수정
+        // 해당 Board에 대한 데이터만 수정 혹은 삭제
         let { data: todos } = await supabase.from("todos").select("*");
 
         if (todos !== null) {
@@ -47,7 +44,7 @@ function BasicBoard({ data }: Props) {
 
                     let newContents = item.contents.filter((element: BoardContent) => element.boardId !== id);
 
-                    // Supabase 데이터베이스에 연동
+                    // Supabase 데이터베이스에 다시 저장
                     const { data, error, status } = await supabase
                         .from("todos")
                         .update({
@@ -64,8 +61,8 @@ function BasicBoard({ data }: Props) {
                     }
                     if (status === 204) {
                         toast({
-                            title: "삭제 완료!",
-                            description: "작성한 글이 Supabase에 올바르게 저장되었습니다.",
+                            title: "삭제가 완료되었습니다.",
+                            description: "Supabase에서 올바르게 삭제되었습니다.",
                         });
                     }
                 } else {
@@ -90,11 +87,11 @@ function BasicBoard({ data }: Props) {
                 <div className={styles.container__body__calendarBox}>
                     <div className="flex items-center gap-3">
                         <span className="text-[#6d6d6d]">From</span>
-                        <Input value={data.startDate.split("T")[0]} disabled />
+                        <Input value={data.startDate !== "" ? data.startDate.split("T")[0] : "pick a date"} disabled />
                     </div>
                     <div className="flex items-center gap-3">
-                        <span className="text-[#6d6d6d]">From</span>
-                        <Input value={data.endDate.split("T")[0]} disabled />
+                        <span className="text-[#6d6d6d]">To</span>
+                        <Input value={data.endDate !== "" ? data.endDate.split("T")[0] : "pick a date"} disabled />
                     </div>
                 </div>
                 <div className={styles.container__body__buttonBox}>
