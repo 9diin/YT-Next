@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
+import { Roboto, Noto_Sans_KR } from "next/font/google";
 // Components
 import SideNavigation from "@/components/common/navigation/SideNavigation";
 // Shadcn UI
@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 // 전역 CSS
 import "@/styles/globals.css";
 
-const roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"] });
+const NOTO_SANS_KR = Noto_Sans_KR({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
     title: "Shadcn UI - Todoboard",
@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={roboto.className}>
+            <body className={NOTO_SANS_KR.className}>
                 <SideNavigation />
                 {children}
                 <Toaster />

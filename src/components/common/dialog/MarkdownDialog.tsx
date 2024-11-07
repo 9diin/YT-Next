@@ -66,7 +66,7 @@ function MarkdownDialog({ data }: Props) {
                         console.log(item);
 
                         item.contents.forEach((element: BoardContent) => {
-                            if (element.boardId === "-0XSbCBnPV8VK6p0HKnV3") {
+                            if (element.boardId === "O0iG07CWUg8n2dRWsUhZq") {
                                 element.content = content;
                                 element.title = title;
                                 element.startDate = startDate;
@@ -127,7 +127,7 @@ function MarkdownDialog({ data }: Props) {
                     <DialogTitle>
                         <div className={styles.dialog__titleBox}>
                             <Checkbox className="w-5 h-5" />
-                            <input type="text" placeholder="Write a title for your board." className={styles.dialog__titleBox__title} onChange={(event) => setTitle(event.target.value)} />
+                            <input type="text" placeholder="Write a title for your board." className={styles.dialog__titleBox__title} onChange={(event) => setTitle(event.target.value)} value={data.title ? data.title : title} />
                         </div>
                     </DialogTitle>
                     <div className={styles.dialog__calendarBox}>
@@ -136,7 +136,7 @@ function MarkdownDialog({ data }: Props) {
                     </div>
                     <Separator />
                     <div className={styles.dialog__markdown}>
-                        <MDEditor value={content} height={100 + "%"} onChange={setContent} />
+                        <MDEditor value={data.content ? data.content : content} height={100 + "%"} onChange={setContent} />
                     </div>
                 </DialogHeader>
                 <DialogFooter>

@@ -10,6 +10,7 @@ import { Dot, Search } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 // CSS
 import styles from "./SideNavigation.module.scss";
+import { SearchBar } from "@/components/ui/search-bar";
 
 function SideNavigation() {
     const router = useRouter();
@@ -54,10 +55,7 @@ function SideNavigation() {
         <div className={styles.container}>
             {/* 검색창 */}
             <div className={styles.container__searchBox}>
-                <Input type="text" placeholder="검색어를 입력해주세요." className="focus-visible:ring-0" />
-                <Button variant={"outline"} size="icon">
-                    <Search className="w-4 h-4" />
-                </Button>
+                <SearchBar placeholder="검색어를 입력하세요." />
             </div>
             <div className={styles.container__buttonBox}>
                 <Button variant={"outline"} className="w-full text-orange-500 border-orange-400 hover:bg-orange-50 hover:text-orange-500" onClick={onCreate}>

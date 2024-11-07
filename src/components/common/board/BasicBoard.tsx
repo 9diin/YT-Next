@@ -1,13 +1,16 @@
 "use client";
 
 import { supabase } from "@/utils/supabase";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import MarkdownDialog from "../dialog/MarkdownDialog";
+import MDEditor from "@uiw/react-md-editor";
 // Shadcn UI
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { ChevronUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 // CSS
 import styles from "./BasicBoard.module.scss";
 import { toast } from "@/components/ui/use-toast";
@@ -29,9 +32,10 @@ interface BoardContent {
 }
 interface Props {
     data: BoardContent;
+    handleBoards: (data: Todo) => void;
 }
 
-function BasicBoard({ data }: Props) {
+function BasicBoard({ data, handleBoards }: Props) {
     const pathname = usePathname();
     const handleDelete = async (id: string | number) => {
         // 해당 Board에 대한 데이터만 수정 혹은 삭제
@@ -64,9 +68,22 @@ function BasicBoard({ data }: Props) {
                             title: "삭제가 완료되었습니다.",
                             description: "Supabase에서 올바르게 삭제되었습니다.",
                         });
+                        getData();
                     }
                 } else {
                     return;
+                }
+            });
+        }
+    };
+    const getData = async () => {
+        let { data: todos, error } = await supabase.from("todos").select("*");
+
+        if (todos !== null) {
+            todos.forEach((item: Todo) => {
+                if (item.id === Number(pathname.split("/")[2])) {
+                    console.log(item);
+                    handleBoards(item);
                 }
             });
         }
@@ -103,6 +120,11 @@ function BasicBoard({ data }: Props) {
                     </Button>
                 </div>
             </div>
+            {data.content && (
+                <Card className="w-full p-4 mb-3">
+                    <MDEditor value={data.content} height={100 + "%"} />
+                </Card>
+            )}
             <div className={styles.container__footer}>
                 <MarkdownDialog data={data} />
             </div>

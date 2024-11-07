@@ -56,7 +56,6 @@ function page() {
                 title: "추가 완료!",
                 description: "새로운 TO DO BOARD가 추가 되었습니다.",
             });
-
             getData();
         }
     };
@@ -107,7 +106,7 @@ function page() {
                 <Button variant={"outline"} size={"icon"} onClick={() => router.back()}>
                     <ChevronLeft />
                 </Button>
-                <Button variant={"outline"}>Save</Button>
+                <Button variant={"outline"}>저장</Button>
             </div>
             <header className={styles.container__header}>
                 <div className={styles.container__header__contents}>
@@ -135,15 +134,15 @@ function page() {
                         <div className={styles.container__body__infoBox}>
                             <span className={styles.title}>There is no board yet.</span>
                             <span className={styles.subTitle}>Click the button and start flashing!</span>
-                            <button className={styles.button}>
+                            <button className={styles.button} onClick={createBoard}>
                                 <Image src="/assets/images/round-button.svg" alt="round-button" width={100} height={100} />
                             </button>
                         </div>
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-start w-full h-full gap-4">
+                    <div className="flex flex-col items-center justify-start w-full h-full gap-4 overflow-y-scroll">
                         {boards?.contents.map((board: BoardContent) => {
-                            return <BasicBoard key={board.boardId} data={board} />;
+                            return <BasicBoard key={board.boardId} data={board} handleBoards={setBoards} />;
                         })}
                     </div>
                 )}
