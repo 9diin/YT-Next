@@ -89,7 +89,6 @@ function page() {
         if (todos !== null) {
             todos.forEach((item: Todo) => {
                 if (item.id === Number(pathname.split("/")[2])) {
-                    console.log(item);
                     setBoards(item);
                 }
             });

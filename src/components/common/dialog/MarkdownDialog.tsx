@@ -32,11 +32,11 @@ interface BoardContent {
 }
 interface Props {
     data: BoardContent;
+    updateBoards: () => void;
 }
 
-function MarkdownDialog({ data }: Props) {
+function MarkdownDialog({ data, updateBoards }: Props) {
     const pathname = usePathname();
-
     const [open, setOpen] = useState<boolean>(false);
     const [title, setTitle] = useState<string>("");
     const [startDate, setStartDate] = useState<Date | undefined>(new Date());
@@ -47,9 +47,7 @@ function MarkdownDialog({ data }: Props) {
     // ==========================================================================================
 
     // Supabase에 저장
-    const onSubmit = async () => {
-        console.log("함수 호출");
-
+    const onSubmit = async (id: string | number) => {
         if (!title || !startDate || !endDate || !content) {
             toast({
                 title: "기입되지 않은 데이터(값)가 있습니다.",
@@ -63,20 +61,13 @@ function MarkdownDialog({ data }: Props) {
             if (todos !== null) {
                 todos.forEach(async (item: Todo) => {
                     if (item.id === Number(pathname.split("/")[2])) {
-                        console.log(item);
-
                         item.contents.forEach((element: BoardContent) => {
-                            if (element.boardId === "O0iG07CWUg8n2dRWsUhZq") {
+                            if (element.boardId === id) {
                                 element.content = content;
                                 element.title = title;
                                 element.startDate = startDate;
                                 element.endDate = endDate;
-                            } else {
-                                element.content = element.content;
-                                element.title = element.title;
-                                element.startDate = element.startDate;
-                                element.endDate = element.endDate;
-                            }
+                            } else return;
                         });
 
                         // Supabase 데이터베이스에 연동
@@ -102,6 +93,7 @@ function MarkdownDialog({ data }: Props) {
 
                             // 등록 후 조건 초기화
                             setOpen(false);
+                            updateBoards();
                         }
                     } else {
                         return;
@@ -146,7 +138,7 @@ function MarkdownDialog({ data }: Props) {
                                 Cancel
                             </Button>
                         </DialogClose>
-                        <Button type={"submit"} className="font-normal border-orange-500 bg-orange-400 text-white hover:bg-orange-400 hover:text-white" onClick={onSubmit}>
+                        <Button type={"submit"} className="font-normal border-orange-500 bg-orange-400 text-white hover:bg-orange-400 hover:text-white" onClick={() => onSubmit(data.boardId)}>
                             Done
                         </Button>
                     </div>

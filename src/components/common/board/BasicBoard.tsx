@@ -79,14 +79,27 @@ function BasicBoard({ data, handleBoards }: Props) {
     const getData = async () => {
         let { data: todos, error } = await supabase.from("todos").select("*");
 
-        if (todos !== null) {
-            todos.forEach((item: Todo) => {
-                if (item.id === Number(pathname.split("/")[2])) {
-                    console.log(item);
-                    handleBoards(item);
-                }
+        if (error) {
+            toast({
+                title: "데이터 로드 실패",
+                description: "데이터를 불러오는 중 오류가 발생했습니다.",
             });
+            return;
         }
+
+        if (todos === null || todos.length === 0) {
+            toast({
+                title: "데이터가 없습니다.",
+                description: "연결된 데이터가 없습니다.",
+            });
+            return;
+        }
+
+        todos.forEach((item: Todo) => {
+            if (item.id === Number(pathname.split("/")[2])) {
+                handleBoards(item);
+            }
+        });
     };
 
     return (
@@ -126,7 +139,7 @@ function BasicBoard({ data, handleBoards }: Props) {
                 </Card>
             )}
             <div className={styles.container__footer}>
-                <MarkdownDialog data={data} />
+                <MarkdownDialog data={data} updateBoards={getData} />
             </div>
         </div>
     );
