@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/utils/supabase";
+import { useAtom } from "jotai";
+import { sidebarStateAtom } from "@/store"; // 위에서 만든 atom을 임포트
 // Shadcn UI
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Dot, Search } from "lucide-react";
+import { Dot } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 // CSS
 import styles from "./SideNavigation.module.scss";
@@ -16,6 +17,7 @@ function SideNavigation() {
     const router = useRouter();
     const [todos, setTodos] = useState<any>([]);
     const { toast } = useToast();
+    const [sidebarState, setSidebarState] = useAtom(sidebarStateAtom); // atom 사용
 
     // 페이지 생성 및 Supabase 연동
     const onCreate = async () => {
@@ -51,7 +53,7 @@ function SideNavigation() {
 
     useEffect(() => {
         getTodos();
-    }, []);
+    }, [sidebarState]);
 
     return (
         <div className={styles.container}>

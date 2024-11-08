@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Roboto, Noto_Sans_KR } from "next/font/google";
+import { Noto_Sans_KR } from "next/font/google";
 // Components
 import SideNavigation from "@/components/common/navigation/SideNavigation";
 // Shadcn UI

@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/utils/supabase";
 import { nanoid } from "nanoid";
+import { useAtom } from "jotai";
+import { sidebarStateAtom } from "@/store"; // 위에서 만든 atom을 임포트
 // COMPONENTS
 import LabelCalendar from "@/components/common/calendar/LabelCalendar";
 import BasicBoard from "@/components/common/board/BasicBoard";
@@ -40,6 +42,7 @@ function Page() {
     const [startDate, setStartDate] = useState<Date | undefined>(new Date());
     const [endDate, setEndDate] = useState<Date | undefined>(new Date());
     const { toast } = useToast();
+    const [sidebarState, setSidebarState] = useAtom(sidebarStateAtom); // atom 사용
 
     const insertRowData = async (contents: BoardContent[]) => {
         // Supabase 데이터베이스에 연동
@@ -117,6 +120,8 @@ function Page() {
                 description: "작성한 글이 Supabase에 올바르게 저장되었습니다.",
             });
             getData();
+            // 상태 변경 함수 (예시: onSave가 호출될 때 상태 변경)
+            setSidebarState("updated"); // 상태 변경
         }
     };
 
