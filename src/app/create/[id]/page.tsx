@@ -32,10 +32,11 @@ interface BoardContent {
     content: string;
 }
 
-function page() {
+function Page() {
     const router = useRouter();
     const pathname = usePathname();
-    const [boards, setBoards] = useState<Todo>();
+    const [title, setTitle] = useState<string>(""); // 초기 title을 빈 문자열로 설정
+    const [boards, setBoards] = useState<Todo | null>(null); // boards의 초기값을 null로 설정
     const [startDate, setStartDate] = useState<Date | undefined>(new Date());
     const [endDate, setEndDate] = useState<Date | undefined>(new Date());
     const { toast } = useToast();
@@ -59,6 +60,7 @@ function page() {
             getData();
         }
     };
+
     const createBoard = () => {
         let newContents: BoardContent[] = [];
         const boardContent = {
@@ -80,8 +82,6 @@ function page() {
         }
     };
 
-    // ====================================================================================================
-
     // Supabase에 기존에 생성된 페이지가 있는지 없는지 확인
     const getData = async () => {
         let { data: todos, error } = await supabase.from("todos").select("*");
@@ -90,8 +90,33 @@ function page() {
             todos.forEach((item: Todo) => {
                 if (item.id === Number(pathname.split("/")[2])) {
                     setBoards(item);
+                    setTitle(item.title); // boards를 가져온 후 title을 갱신
                 }
             });
+        }
+    };
+
+    const onSave = async () => {
+        const { data, error, status } = await supabase
+            .from("todos")
+            .update({
+                title: title,
+            })
+            .eq("id", pathname.split("/")[2]);
+
+        if (error) {
+            console.log(error);
+            toast({
+                title: "에러가 발생했습니다.",
+                description: "콘솔 창에 출력된 에러를 확인하세요.",
+            });
+        }
+        if (status === 204) {
+            toast({
+                title: "수정 완료!",
+                description: "작성한 글이 Supabase에 올바르게 저장되었습니다.",
+            });
+            getData();
         }
     };
 
@@ -105,19 +130,29 @@ function page() {
                 <Button variant={"outline"} size={"icon"} onClick={() => router.back()}>
                     <ChevronLeft />
                 </Button>
-                <Button variant={"outline"}>저장</Button>
+                <Button variant={"outline"} onClick={onSave}>
+                    저장
+                </Button>
             </div>
             <header className={styles.container__header}>
                 <div className={styles.container__header__contents}>
-                    <input type="text" placeholder="Enter Title Here" className={styles.input} />
+                    <input
+                        type="text"
+                        placeholder="Enter Title Here"
+                        className={styles.input}
+                        onChange={(event) => setTitle(event.target.value)} // title 상태 갱신
+                        value={title} // title을 상태에서 직접 가져오기
+                    />
                     <div className={styles.progressBar}>
                         <span className={styles.progressBar__status}>0/10 completed</span>
                         {/* 프로그레스 바 UI */}
+
                         <Progress value={33} className="w-[30%] h-2" indicatorColor="bg-green-500" />
                     </div>
                     <div className={styles.calendarBox}>
                         <div className={styles.calendarBox__calendar}>
                             {/* 캘린더 UI */}
+
                             <LabelCalendar label="From" handleDate={setStartDate} />
                             <LabelCalendar label="To" handleDate={setEndDate} />
                         </div>
@@ -150,4 +185,4 @@ function page() {
     );
 }
 
-export default page;
+export default Page;
